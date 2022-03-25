@@ -57,8 +57,16 @@ export function postAnswer(object) {
     })
   }
 }
-export function postQuiz() {
-  return function (dispatch)  {
-  }
+export function postQuiz(object) {
+  return function (dispatch) {
+    axios.post(`http://localhost:9000/api/quiz/new`, {question_text: object.question_text, true_answer_text: object.true_answer_text, false_answer_text: object.false_answer_text})
+      .then(response => {
+        dispatch(setMessage(`Congrats: "${response.data.question}" is a great question!`));
+        dispatch(resetForm());
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
 }
 // ❗ On promise rejections, use log statements or breakpoints, and put an appropriate error message in state
