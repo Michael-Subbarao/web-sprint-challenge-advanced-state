@@ -10,37 +10,55 @@ export function moveCounterClockwise(value) {
   return { type: type.MOVE_COUNTERCLOCKWISE, payload: value };
 }
 
-export function selectAnswer() { }
+export function selectAnswer(value) {
+  return { type: type.SET_SELECTED_ANSWER, payload: value };
+ }
 
-export function setMessage() { }
+export function setMessage(value) {
+  return { type: type.SET_INFO_MESSAGE, payload: value };
+ }
 
-export function setQuiz() { }
+export function setQuiz(value){ 
+  return { type: type.SET_QUIZ_INTO_STATE, payload: value };
+}
 
-export function inputChange() { }
+export function inputChange(value) { 
+  return { type: type.INPUT_CHANGE, payload: value };
+}
 
-export function resetForm() { }
+export function resetForm() { 
+  return { type: type.RESET_FORM};
+}
 
 // ❗ Async action creators
 export function fetchQuiz() {
   return function (dispatch) {
-    // First, dispatch an action to reset the quiz state (so the "Loading next quiz..." message can display)
-    // On successful GET:
-    // - Dispatch an action to send the obtained quiz to its state
+    axios.get(`http://localhost:9000/api/quiz/next`)
+      .then(response => {
+        dispatch(setQuiz(response.data))
+      })
+      .catch(error => {
+        console.error(error)
+      })
   }
 }
-export function postAnswer() {
+export function postAnswer(object) {
   return function (dispatch) {
-    // On successful POST:
-    // - Dispatch an action to reset the selected answer state
-    // - Dispatch an action to set the server message to state
-    // - Dispatch the fetching of the next quiz
+    axios.post(`http://localhost:9000/api/quiz/answer`, {quiz_id:object.quiz_id, answer_id:object.answer_id})
+    .then(response=> {
+      //console.log(response.data);
+      dispatch(setQuiz(null))
+      dispatch(fetchQuiz())
+      dispatch(selectAnswer(null))      
+      dispatch(setMessage(response.data.message))
+    })
+    .catch(error=> {
+      console.error(error)
+    })
   }
 }
 export function postQuiz() {
-  return function (dispatch) {
-    // On successful POST:
-    // - Dispatch the correct message to the the appropriate state
-    // - Dispatch the resetting of the form
+  return function (dispatch)  {
   }
 }
 // ❗ On promise rejections, use log statements or breakpoints, and put an appropriate error message in state
